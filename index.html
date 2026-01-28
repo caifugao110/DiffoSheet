@@ -358,6 +358,42 @@
         .icon-b-unique { color: #8b5cf6 !important; } /* 紫色 */
         .icon-union { color: #eab308 !important; } /* 黄色 */
 
+        /* 数据预览表格样式 */
+        .preview-table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-table th {
+            background-color: #f8fafc;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        
+        .preview-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+            color: #6b7280;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .preview-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .preview-table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
         /* 完全复制的页脚样式 */
         .footer {
             margin-top: 10px;
@@ -439,7 +475,7 @@
                         <i class="fas fa-file-export"></i>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">多格式支持</h3>
-                    <p class="text-gray-600">支持CSV、XLS、XLSX、TXT、MD格式，无需转换直接对比</p>
+                    <p class="text-gray-600">支持CSV、XLS、XLSX、TXT、MD、JSON、XML、TSV格式，无需转换直接对比</p>
                 </div>
                 
                 <div class="glassmorphism p-6 text-center feature-card fade-in" style="animation-delay: 0.3s;">
@@ -467,7 +503,7 @@
                 <div class="file-upload-container flex flex-col md:flex-row gap-6">
                     <!-- 文件A上传 -->
                     <div class="file-upload-area relative flex-1 rounded-lg p-8 text-center card-hover">
-                        <input type="file" class="file-upload-input" id="fileA" accept=".csv,.xls,.xlsx,.txt,.md">
+                        <input type="file" class="file-upload-input" id="fileA" accept=".csv,.xls,.xlsx,.txt,.md,.json,.xml,.tsv">
                         <div class="flex flex-col items-center justify-center h-full">
                             <div class="file-icon-container mb-4 relative">
                                 <i class="fas fa-file-upload text-4xl text-indigo-500"></i>
@@ -476,7 +512,7 @@
                                 </div>
                             </div>
                             <h3 class="text-xl font-medium mb-2">文件 A</h3>
-                            <p class="text-gray-500 mb-4">支持 CSV、XLS、XLSX、TXT、MD 格式</p>
+                            <p class="text-gray-500 mb-4">支持 CSV、XLS、XLSX、TXT、MD、JSON、XML、TSV 格式</p>
                             <div class="flex items-center mt-2">
                                 <input type="checkbox" id="includeHeaderA" class="mr-2 h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300">
                                 <label for="includeHeaderA" class="text-sm text-gray-600">表头不参与数据对比</label>
@@ -491,7 +527,7 @@
 
                     <!-- 文件B上传 -->
                     <div class="file-upload-area relative flex-1 rounded-lg p-8 text-center card-hover">
-                        <input type="file" class="file-upload-input" id="fileB" accept=".csv,.xls,.xlsx,.txt,.md">
+                        <input type="file" class="file-upload-input" id="fileB" accept=".csv,.xls,.xlsx,.txt,.md,.json,.xml,.tsv">
                         <div class="flex flex-col items-center justify-center h-full">
                             <div class="file-icon-container mb-4 relative">
                                 <i class="fas fa-file-upload text-4xl text-indigo-500"></i>
@@ -500,7 +536,7 @@
                                 </div>
                             </div>
                             <h3 class="text-xl font-medium mb-2">文件 B</h3>
-                            <p class="text-gray-500 mb-4">支持 CSV、XLS、XLSX、TXT、MD 格式</p>
+                            <p class="text-gray-500 mb-4">支持 CSV、XLS、XLSX、TXT、MD、JSON、XML、TSV 格式</p>
                             <div class="flex items-center mt-2">
                                 <input type="checkbox" id="includeHeaderB" class="mr-2 h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300">
                                 <label for="includeHeaderB" class="text-sm text-gray-600">表头不参与数据对比</label>
@@ -515,6 +551,47 @@
                 </div>
             </div>
 
+            <!-- 数据预览区域 -->
+            <div class="glassmorphism p-8 mb-8 fade-in" style="animation-delay: 0.55s;" id="previewSection" style="display: none;">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800 flex items-center">
+                    <i class="fas fa-eye mr-3 text-indigo-600"></i>数据预览
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-medium mb-3 text-gray-700">文件 A 预览</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200" id="previewTableA">
+                                <thead class="bg-gray-50">
+                                    <tr id="previewHeaderA"></tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="previewBodyA"></tbody>
+                            </table>
+                            <p class="text-sm text-gray-500 mt-2" id="previewInfoA"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium mb-3 text-gray-700">文件 B 预览</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200" id="previewTableB">
+                                <thead class="bg-gray-50">
+                                    <tr id="previewHeaderB"></tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="previewBodyB"></tbody>
+                            </table>
+                            <p class="text-sm text-gray-500 mt-2" id="previewInfoB"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-between items-center">
+                    <button type="button" id="togglePreviewBtn" class="text-sm text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-eye-slash mr-1"></i>隐藏预览
+                    </button>
+                    <div class="text-sm text-gray-500">
+                        显示前 <span id="previewRowCount">10</span> 行数据
+                    </div>
+                </div>
+            </div>
+
             <!-- 对比选项区域 -->
             <div class="glassmorphism p-8 mb-8 fade-in" style="animation-delay: 0.6s;">
                 <h2 class="text-2xl font-semibold mb-6 text-gray-800 flex items-center">
@@ -523,9 +600,15 @@
                 
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-2 flex items-center">
-                        <i class="fas fa-columns mr-2 text-indigo-500"></i>选择对比列 (默认第一列)
+                        <i class="fas fa-columns mr-2 text-indigo-500"></i>选择对比列
                     </label>
-                    <div class="flex flex-col md:flex-row gap-4">
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="multiColumnMode" class="mr-2 h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">启用多列对比模式</span>
+                        </label>
+                    </div>
+                    <div id="singleColumnMode" class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1">
                             <label class="block text-sm text-gray-500 mb-1 text-left">文件 A 对比列</label>
                             <select id="columnA" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300">
@@ -538,6 +621,32 @@
                                 <option value="0">第一列</option>
                             </select>
                         </div>
+                    </div>
+                    <div id="multiColumnModeContainer" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-500 mb-1 text-left">文件 A 对比列</label>
+                                <div id="columnsAContainer" class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="column-checkbox-a mr-2" value="0" checked>
+                                        <span class="text-sm">第一列</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-500 mb-1 text-left">文件 B 对比列</label>
+                                <div id="columnsBContainer" class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="column-checkbox-b mr-2" value="0" checked>
+                                        <span class="text-sm">第一列</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="selectAllColumnsA" class="text-sm text-indigo-600 hover:text-indigo-800 mt-2">全选</button>
+                        <button type="button" id="clearAllColumnsA" class="text-sm text-gray-600 hover:text-gray-800 mt-2 ml-2">清除</button>
+                        <button type="button" id="selectAllColumnsB" class="text-sm text-indigo-600 hover:text-indigo-800 mt-2 ml-4">全选</button>
+                        <button type="button" id="clearAllColumnsB" class="text-sm text-gray-600 hover:text-gray-800 mt-2 ml-2">清除</button>
                     </div>
                 </div>
                 
@@ -709,11 +818,11 @@
                 if (!file) return;
                 
                 // 检查文件类型
-                const validExtensions = ['csv', 'xls', 'xlsx', 'txt', 'md'];
+                const validExtensions = ['csv', 'xls', 'xlsx', 'txt', 'md', 'json', 'xml', 'tsv'];
                 const fileExtension = file.name.split('.').pop().toLowerCase();
                 
                 if (!validExtensions.includes(fileExtension)) {
-                    showStatus('请上传CSV、XLS、XLSX、TXT或MD格式的文件', 'error');
+                    showStatus('请上传CSV、XLS、XLSX、TXT、MD、JSON、XML或TSV格式的文件', 'error');
                     return;
                 }
                 
@@ -742,6 +851,12 @@
                             parsedData = parseExcelFile(content, fileExtension);
                         } else if (fileExtension === 'md') {
                             parsedData = parseMarkdownFile(content);
+                        } else if (fileExtension === 'json') {
+                            parsedData = parseJsonFile(content);
+                        } else if (fileExtension === 'xml') {
+                            parsedData = parseXmlFile(content);
+                        } else if (fileExtension === 'tsv') {
+                            parsedData = parseTsvFile(content);
                         }
                         
                         if (!parsedData || parsedData.length === 0) {
@@ -780,7 +895,7 @@
                     }
                 };
                 
-                if (['csv', 'txt', 'md'].includes(fileExtension)) {
+                if (['csv', 'txt', 'md', 'json', 'xml', 'tsv'].includes(fileExtension)) {
                     reader.readAsText(file);
                 } else {
                     reader.readAsArrayBuffer(file);
@@ -822,6 +937,131 @@
                 });
             }
             
+            // 解析JSON文件
+            function parseJsonFile(content) {
+                try {
+                    const jsonData = JSON.parse(content);
+                    
+                    // 处理数组格式的JSON
+                    if (Array.isArray(jsonData)) {
+                        if (jsonData.length === 0) return [];
+                        
+                        // 如果是对象数组，提取所有键作为列
+                        if (typeof jsonData[0] === 'object' && jsonData[0] !== null) {
+                            const headers = Object.keys(jsonData[0]);
+                            const data = [headers];
+                            
+                            jsonData.forEach(item => {
+                                const row = headers.map(key => String(item[key] || ''));
+                                data.push(row);
+                            });
+                            
+                            return data;
+                        }
+                        
+                        // 如果是简单值数组
+                        return jsonData.map(item => [String(item)]);
+                    }
+                    
+                    // 处理对象格式的JSON
+                    if (typeof jsonData === 'object' && jsonData !== null) {
+                        const data = [['Key', 'Value']];
+                        Object.entries(jsonData).forEach(([key, value]) => {
+                            data.push([key, String(value)]);
+                        });
+                        return data;
+                    }
+                    
+                    throw new Error('不支持的JSON格式');
+                } catch (error) {
+                    throw new Error(`JSON解析失败: ${error.message}`);
+                }
+            }
+            
+            // 解析XML文件
+            function parseXmlFile(content) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(content, 'text/xml');
+                    
+                    // 检查解析错误
+                    const parserError = xmlDoc.querySelector('parsererror');
+                    if (parserError) {
+                        throw new Error('XML格式错误');
+                    }
+                    
+                    // 获取所有具有相同标签名的元素
+                    const allElements = xmlDoc.getElementsByTagName('*');
+                    if (allElements.length === 0) {
+                        throw new Error('XML文件中没有数据');
+                    }
+                    
+                    // 寻找具有相同标签名的元素组
+                    const tagCounts = {};
+                    for (let elem of allElements) {
+                        const tagName = elem.tagName;
+                        tagCounts[tagName] = (tagCounts[tagName] || 0) + 1;
+                    }
+                    
+                    // 找到最常见的标签
+                    let mostCommonTag = null;
+                    let maxCount = 0;
+                    for (let [tag, count] of Object.entries(tagCounts)) {
+                        if (count > maxCount) {
+                            maxCount = count;
+                            mostCommonTag = tag;
+                        }
+                    }
+                    
+                    if (!mostCommonTag || maxCount < 2) {
+                        throw new Error('XML文件中没有找到合适的数据结构');
+                    }
+                    
+                    const targetElements = xmlDoc.getElementsByTagName(mostCommonTag);
+                    if (targetElements.length === 0) {
+                        throw new Error('XML文件中没有找到数据');
+                    }
+                    
+                    // 提取数据
+                    const data = [];
+                    let headers = null;
+                    
+                    for (let elem of targetElements) {
+                        const rowData = {};
+                        
+                        // 获取所有子元素的文本内容
+                        for (let child of elem.children) {
+                            rowData[child.tagName] = child.textContent.trim();
+                        }
+                        
+                        // 获取属性
+                        for (let attr of elem.attributes) {
+                            rowData[attr.name] = attr.value;
+                        }
+                        
+                        if (Object.keys(rowData).length > 0) {
+                            if (!headers) {
+                                headers = Object.keys(rowData);
+                                data.push(headers);
+                            }
+                            
+                            const row = headers.map(key => rowData[key] || '');
+                            data.push(row);
+                        }
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    throw new Error(`XML解析失败: ${error.message}`);
+                }
+            }
+            
+            // 解析TSV文件
+            function parseTsvFile(content) {
+                const lines = content.split(/\r\n|\n/).filter(line => line.trim() !== '');
+                return lines.map(line => line.split('\t').map(cell => cell.trim()));
+            }
+            
             // 填充列选择下拉框
             function populateColumnDropdown(selectId, data) {
                 const select = document.getElementById(selectId);
@@ -839,7 +1079,166 @@
                     option.textContent = `第${i + 1}列${data[0][i] ? ` (${data[0][i]})` : ''}`;
                     select.appendChild(option);
                 }
+                
+                // 更新多列选择界面
+                updateMultiColumnCheckboxes(data);
+                
+                // 显示数据预览
+                showDataPreview();
             }
+            
+            // 显示数据预览
+            function showDataPreview() {
+                const previewSection = document.getElementById('previewSection');
+                previewSection.style.display = 'block';
+                
+                if (fileAData) {
+                    renderPreviewTable(fileAData, 'A');
+                }
+                
+                if (fileBData) {
+                    renderPreviewTable(fileBData, 'B');
+                }
+            }
+            
+            // 渲染预览表格
+            function renderPreviewTable(data, fileType) {
+                if (!data || data.length === 0) return;
+                
+                const maxRows = 10;
+                const displayData = data.slice(0, maxRows);
+                
+                const headerContainer = document.getElementById(`previewHeader${fileType}`);
+                const bodyContainer = document.getElementById(`previewBody${fileType}`);
+                const infoContainer = document.getElementById(`previewInfo${fileType}`);
+                
+                // 清空现有内容
+                headerContainer.innerHTML = '';
+                bodyContainer.innerHTML = '';
+                
+                // 创建表头
+                if (data[0] && data[0].length > 0) {
+                    data[0].forEach((header, index) => {
+                        const th = document.createElement('th');
+                        th.textContent = header || `列${index + 1}`;
+                        th.className = 'px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+                        headerContainer.appendChild(th);
+                    });
+                }
+                
+                // 创建表格内容
+                displayData.forEach((row, rowIndex) => {
+                    if (rowIndex === 0 && data.length > 1) return; // 跳过表头行
+                    
+                    const tr = document.createElement('tr');
+                    row.forEach((cell, cellIndex) => {
+                        const td = document.createElement('td');
+                        td.textContent = cell || '';
+                        td.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900';
+                        td.title = cell || ''; // 添加完整内容的提示
+                        tr.appendChild(td);
+                    });
+                    bodyContainer.appendChild(tr);
+                });
+                
+                // 更新信息
+                const totalRows = data.length;
+                const displayRows = Math.min(maxRows, totalRows);
+                infoContainer.textContent = `显示 ${displayRows} / ${totalRows} 行，${data[0]?.length || 0} 列`;
+                
+                // 更新预览行数显示
+                document.getElementById('previewRowCount').textContent = maxRows;
+            }
+            
+            // 切换预览显示/隐藏
+            document.getElementById('togglePreviewBtn').addEventListener('click', function() {
+                const previewSection = document.getElementById('previewSection');
+                const isVisible = previewSection.style.display !== 'none';
+                
+                if (isVisible) {
+                    previewSection.style.display = 'none';
+                    this.innerHTML = '<i class="fas fa-eye mr-1"></i>显示预览';
+                } else {
+                    previewSection.style.display = 'block';
+                    this.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>隐藏预览';
+                    showDataPreview(); // 重新加载预览
+                }
+            });
+            
+            // 更新多列选择复选框
+            function updateMultiColumnCheckboxes(data) {
+                if (!data || data.length === 0) return;
+                
+                const columnCount = data[0].length;
+                const containerA = document.getElementById('columnsAContainer');
+                const containerB = document.getElementById('columnsBContainer');
+                
+                containerA.innerHTML = '';
+                containerB.innerHTML = '';
+                
+                for (let i = 0; i < columnCount; i++) {
+                    const labelA = data[0][i] ? `第${i + 1}列 (${data[0][i]})` : `第${i + 1}列`;
+                    const labelB = data[0][i] ? `第${i + 1}列 (${data[0][i]})` : `第${i + 1}列`;
+                    
+                    // 文件A的复选框
+                    const divA = document.createElement('div');
+                    divA.className = 'flex items-center';
+                    divA.innerHTML = `
+                        <input type="checkbox" class="column-checkbox-a mr-2" value="${i}" ${i === 0 ? 'checked' : ''}>
+                        <span class="text-sm">${labelA}</span>
+                    `;
+                    containerA.appendChild(divA);
+                    
+                    // 文件B的复选框
+                    const divB = document.createElement('div');
+                    divB.className = 'flex items-center';
+                    divB.innerHTML = `
+                        <input type="checkbox" class="column-checkbox-b mr-2" value="${i}" ${i === 0 ? 'checked' : ''}>
+                        <span class="text-sm">${labelB}</span>
+                    `;
+                    containerB.appendChild(divB);
+                }
+            }
+            
+            // 多列模式切换
+            const multiColumnModeCheckbox = document.getElementById('multiColumnMode');
+            const singleColumnMode = document.getElementById('singleColumnMode');
+            const multiColumnModeContainer = document.getElementById('multiColumnModeContainer');
+            
+            multiColumnModeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    singleColumnMode.classList.add('hidden');
+                    multiColumnModeContainer.classList.remove('hidden');
+                } else {
+                    singleColumnMode.classList.remove('hidden');
+                    multiColumnModeContainer.classList.add('hidden');
+                }
+            });
+            
+            // 全选/清除按钮事件
+            document.getElementById('selectAllColumnsA').addEventListener('click', function() {
+                document.querySelectorAll('.column-checkbox-a').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            });
+            
+            document.getElementById('clearAllColumnsA').addEventListener('click', function() {
+                document.querySelectorAll('.column-checkbox-a').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
+            
+            document.getElementById('selectAllColumnsB').addEventListener('click', function() {
+                document.querySelectorAll('.column-checkbox-b').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            });
+            
+            document.getElementById('clearAllColumnsB').addEventListener('click', function() {
+                document.querySelectorAll('.column-checkbox-b').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
             
             // 导出类型选择
             const exportCheckboxes = document.querySelectorAll('.export-option input[type="checkbox"]');
@@ -896,19 +1295,36 @@
                 // 显示加载指示器
                 exportLoadingIndicator.classList.remove('hidden');
                 
-                const columnA = parseInt(document.getElementById('columnA').value);
-                const columnB = parseInt(document.getElementById('columnB').value);
                 const includeHeaderA = document.getElementById('includeHeaderA').checked;
                 const includeHeaderB = document.getElementById('includeHeaderB').checked;
+                const isMultiColumn = document.getElementById('multiColumnMode').checked;
+                
+                let columnsA, columnsB;
+                
+                if (isMultiColumn) {
+                    // 多列模式
+                    columnsA = Array.from(document.querySelectorAll('.column-checkbox-a:checked')).map(cb => parseInt(cb.value));
+                    columnsB = Array.from(document.querySelectorAll('.column-checkbox-b:checked')).map(cb => parseInt(cb.value));
+                    
+                    if (columnsA.length === 0 || columnsB.length === 0) {
+                        showStatus('请至少选择一列进行对比', 'warning');
+                        exportLoadingIndicator.classList.add('hidden');
+                        return;
+                    }
+                } else {
+                    // 单列模式
+                    columnsA = [parseInt(document.getElementById('columnA').value)];
+                    columnsB = [parseInt(document.getElementById('columnB').value)];
+                }
                 
                 // 模拟处理延迟
                 setTimeout(() => {
                     try {
                         // 执行对比
-                        const result = compareFiles(fileAData, fileBData, columnA, columnB, includeHeaderA, includeHeaderB);
+                        const result = compareFilesMultiColumn(fileAData, fileBData, columnsA, columnsB, includeHeaderA, includeHeaderB);
                         
                         // 导出结果
-                        exportResults(result);
+                        exportResultsMultiColumn(result, isMultiColumn);
                         
                         // 隐藏加载指示器
                         exportLoadingIndicator.classList.add('hidden');
@@ -919,7 +1335,7 @@
                 }, 1500);
             });
             
-            // 对比文件
+            // 单列对比（保持向后兼容）
             function compareFiles(dataA, dataB, columnA, columnB, includeHeaderA, includeHeaderB) {
                 const result = {
                     same: [],
@@ -995,7 +1411,73 @@
                 return result;
             }
             
-            // 导出结果函数（假设完整实现）
+            // 多列对比
+            function compareFilesMultiColumn(dataA, dataB, columnsA, columnsB, includeHeaderA, includeHeaderB) {
+                const result = {
+                    same: [],
+                    different: [],
+                    aUnique: [],
+                    bUnique: [],
+                    union: new Set()
+                };
+                
+                // 确定数据起始行（是否包含表头）
+                const startRowA = includeHeaderA ? 1 : 0;
+                const startRowB = includeHeaderB ? 1 : 0;
+                
+                // 提取多列组合值
+                const valuesA = new Map();
+                const valuesB = new Map();
+                
+                // 处理文件A
+                for (let i = startRowA; i < dataA.length; i++) {
+                    const key = columnsA.map(col => dataA[i][col] || '').join('|');
+                    if (key.trim()) {
+                        valuesA.set(key, i);
+                        result.union.add(key);
+                    }
+                }
+                
+                // 处理文件B
+                for (let i = startRowB; i < dataB.length; i++) {
+                    const key = columnsB.map(col => dataB[i][col] || '').join('|');
+                    if (key.trim()) {
+                        valuesB.set(key, i);
+                        result.union.add(key);
+                    }
+                }
+                
+                // 找出相同值
+                for (const [value, indexA] of valuesA.entries()) {
+                    if (valuesB.has(value)) {
+                        const indexB = valuesB.get(value);
+                        result.same.push({
+                            value,
+                            rowA: indexA,
+                            rowB: indexB
+                        });
+                    } else {
+                        result.aUnique.push({
+                            value,
+                            rowA: indexA
+                        });
+                    }
+                }
+                
+                // 找出B唯一值
+                for (const [value, indexB] of valuesB.entries()) {
+                    if (!valuesA.has(value)) {
+                        result.bUnique.push({
+                            value,
+                            rowB: indexB
+                        });
+                    }
+                }
+                
+                return result;
+            }
+            
+            // 单列导出（保持向后兼容）
             function exportResults(result) {
                 // 创建工作簿
                 const wb = XLSX.utils.book_new();
@@ -1039,6 +1521,83 @@
                 // 生成带时间戳的文件名
                 const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
                 const fileName = `表格对比结果_${timestamp}.xlsx`;
+                
+                // 导出文件
+                XLSX.writeFile(wb, fileName);
+                showStatus(`导出成功，文件已保存为 ${fileName}`, 'success');
+            }
+            
+            // 多列导出
+            function exportResultsMultiColumn(result, isMultiColumn) {
+                // 创建工作簿
+                const wb = XLSX.utils.book_new();
+                
+                // 根据选择的导出类型创建工作表
+                if (exportTypes.includes('same') && result.same.length > 0) {
+                    const sameData = result.same.map(item => {
+                        const values = item.value.split('|');
+                        return [...values, `行${item.rowA+1}`, `行${item.rowB+1}`];
+                    });
+                    
+                    const headers = isMultiColumn ? 
+                        ['组合值', '文件A行号', '文件B行号'] : 
+                        ['相同值', '文件A行号', '文件B行号'];
+                    sameData.unshift(headers);
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(sameData);
+                    XLSX.utils.book_append_sheet(wb, ws, '相同值');
+                }
+                
+                if (exportTypes.includes('a-unique') && result.aUnique.length > 0) {
+                    const aUniqueData = result.aUnique.map(item => {
+                        const values = item.value.split('|');
+                        return [...values, `行${item.rowA+1}`];
+                    });
+                    
+                    const headers = isMultiColumn ? 
+                        ['组合值', '行号'] : 
+                        ['A唯一值', '行号'];
+                    aUniqueData.unshift(headers);
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(aUniqueData);
+                    XLSX.utils.book_append_sheet(wb, ws, 'A唯一值');
+                }
+                
+                if (exportTypes.includes('b-unique') && result.bUnique.length > 0) {
+                    const bUniqueData = result.bUnique.map(item => {
+                        const values = item.value.split('|');
+                        return [...values, `行${item.rowB+1}`];
+                    });
+                    
+                    const headers = isMultiColumn ? 
+                        ['组合值', '行号'] : 
+                        ['B唯一值', '行号'];
+                    bUniqueData.unshift(headers);
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(bUniqueData);
+                    XLSX.utils.book_append_sheet(wb, ws, 'B唯一值');
+                }
+                
+                if (exportTypes.includes('union') && result.union.size > 0) {
+                    const unionData = Array.from(result.union).map(value => {
+                        const values = value.split('|');
+                        return [...values];
+                    });
+                    
+                    const headers = isMultiColumn ? 
+                        ['组合值'] : 
+                        ['去重合集'];
+                    unionData.unshift(headers);
+                    
+                    const ws = XLSX.utils.aoa_to_sheet(unionData);
+                    XLSX.utils.book_append_sheet(wb, ws, '去重合集');
+                }
+                
+                // 生成带时间戳的文件名
+                const timestamp = new Date().toISOString().replace(/:/g, '-').split('.')[0];
+                const fileName = isMultiColumn ? 
+                    `多列表格对比结果_${timestamp}.xlsx` : 
+                    `表格对比结果_${timestamp}.xlsx`;
                 
                 // 导出文件
                 XLSX.writeFile(wb, fileName);
